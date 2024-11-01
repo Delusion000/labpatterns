@@ -7,4 +7,5 @@ public class RespiratorySymptom extends Symptom{
 		// TODO Auto-generated constructor stub
 	}
 
+
 }

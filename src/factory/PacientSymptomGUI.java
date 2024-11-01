@@ -6,6 +6,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import domain.Covid19Pacient;
+import domain.CovidImpactCalculator;
 import domain.Symptom;
 
 import javax.swing.JLabel;
@@ -30,6 +31,8 @@ public class PacientSymptomGUI extends JFrame {
 	private JLabel labelPacient;
 	private JTextField symptonNameField;
 	private JLabel reportLabel;
+
+
 
 	
 	/**
@@ -109,45 +112,53 @@ public class PacientSymptomGUI extends JFrame {
 		
 	}
 	
-	public void addSymptom(Covid19Pacient p, String symptomName) {
-		Symptom s;
-		if (isNumeric(weightField.getText())) {
-		  if (p.getSymptomByName(symptomName)==null) {
-			if (Integer.parseInt(weightField.getText())<=3) {
-				s=p.addSymptomByName(symptomName, Integer.parseInt(weightField.getText()));
-				if (s!=null) {
-					errorLabel.setText("Symptom added :"+symptomName);
-					reportLabel.setText(createReport());
-				} else errorLabel.setText("ERROR, Symptom "+symptomName+ " does not exist ");
-			} else errorLabel.setText("ERROR, Weight between [1..3]");
-		  } 
-		  else errorLabel.setText("ERROR, Symptom "+symptomName+" already assigned ");
-		} else errorLabel.setText("ERROR, weight must be an integer");
-		  
-	}
-	
-	public void removeSymptom(String symptomName) {
-		if (p.getSymptomByName(symptomName)!=null) {
-			p.removeSymptomByName(symptomName);
-			errorLabel.setText("Symptom removed :"+symptomName);
-			reportLabel.setText(createReport());
-
-		
-	     } else errorLabel.setText("ERROR, Symptom does not exist");
-	}
-	
-	public String createReport() {
-		Iterator<Symptom> i=p.getSymptoms().iterator();
-	    Symptom p2;
-	    String s="<html> Covid impact: <b>"+p.covidImpact()+"</b><br>";
-	    s=s+"Symptoms: <br>";
-	    while (i.hasNext()) {
-	    	 p2=i.next();
-	    	if (p2!=null) 
-	        	s=s+p2.toString()+", "+p.getWeight(p2)+"<br>";	
+	 public void addSymptom(Covid19Pacient p, String symptomName) {
+	        Symptom s;
+	        if (isNumeric(weightField.getText())) {
+	            if (p.getSymptomsMap().containsKey(p.getSymptomByName(symptomName))) {
+	                errorLabel.setText("ERROR, Symptom " + symptomName + " already assigned ");
+	            } else {
+	                if (Integer.parseInt(weightField.getText()) <= 3) {
+	                    s = p.addSymptomByName(symptomName, Integer.parseInt(weightField.getText()));
+	                    if (s != null) {
+	                        errorLabel.setText("Symptom added :" + symptomName);
+	                        reportLabel.setText(createReport(new CovidImpactCalculator()));
+	                    } else {
+	                        errorLabel.setText("ERROR, Symptom " + symptomName + " does not exist ");
+	                    }
+	                } else {
+	                    errorLabel.setText("ERROR, Weight between [1..3]");
+	                }
+	            }
+	        } else {
+	            errorLabel.setText("ERROR, weight must be an integer");
+	        }
 	    }
-	    s=s+"</html>";
-        return s;	}
+	
+	 public void removeSymptom(String symptomName) {
+	        if (p.getSymptomsMap().containsKey(p.getSymptomByName(symptomName))) {
+	            p.removeSymptomByName(symptomName);
+	            errorLabel.setText("Symptom removed :" + symptomName);
+	            reportLabel.setText(createReport(new CovidImpactCalculator()));
+	        } else {
+	            errorLabel.setText("ERROR, Symptom does not exist");
+	        }
+	    }
+	
+	 public String createReport(CovidImpactCalculator calculator) {
+	        Iterator<Symptom> i = p.getSymptoms().iterator();
+	        Symptom p2;
+	        double covidImpact = calculator.calculateImpact(p.getAge(), p.getSymptomsMap());
+	        StringBuilder s = new StringBuilder("<html> Covid impact: <b>" + covidImpact + "</b><br>");
+	        s.append("Symptoms: <br>");
+	        while (i.hasNext()) {
+	            p2 = i.next();
+	            if (p2 != null) 
+	                s.append(p2.toString()).append(", ").append(p.getWeight(p2)).append("<br>");  
+	        }
+	        s.append("</html>");
+	        return s.toString();    
+	    }
 	
 	public boolean isNumeric(String str) { 
 		  try {  

@@ -1,19 +1,23 @@
-package adapter2;
+package observer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+
 import javax.swing.table.AbstractTableModel;
-import domain.Covid19Pacient;
 import domain.Symptom;
 
-public class Covid19PacientTableModelAdapter extends AbstractTableModel {
-    protected Covid19Pacient pacient;
+public class Covid19PacientTableModelAdapter extends AbstractTableModel implements Observer {
+    protected Covid19Pacient2 pacient;
     protected String[] columnNames = new String[] {"Symptom", "Weight"};
     private List<Symptom> symptoms;
+    
 
-    public Covid19PacientTableModelAdapter(Covid19Pacient p) {
+    public Covid19PacientTableModelAdapter(Covid19Pacient2 p) {
         this.pacient = p;
-        this.symptoms = new ArrayList<>(pacient.getSymptoms());
+        this.symptoms = new ArrayList<>(pacient.getSymptoms()); 
+        pacient.addObserver(this);
     }
 
     @Override
@@ -43,4 +47,11 @@ public class Covid19PacientTableModelAdapter extends AbstractTableModel {
                 return null;
         }
     }
+
+	@Override
+	public void update(Observable o, Object arg) {
+		 symptoms = new ArrayList<>(pacient.getSymptoms()); // Actualiza la lista de síntomas
+	        fireTableDataChanged();
+		
+	}
 }

@@ -7,7 +7,6 @@ import javax.swing.border.EmptyBorder;
 
 import domain.Medicament;
 import domain.Symptom;
-
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JButton;
@@ -99,7 +98,7 @@ public class  MedicalGUI extends JFrame {
 		Symptom s;
 		
 		  if (m.getSymptomByName(symptomName)==null) {
-				s=m.addSymptomByName(symptomName);
+				s=m.addSymptomByNameMed(symptomName);
 				if (s!=null) {
 					errorLabel.setText("<html>Symptom added: <b>"+symptomName+"</b></html>");
 					reportLabel.setText(createReport());

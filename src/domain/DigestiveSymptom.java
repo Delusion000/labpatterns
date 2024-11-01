@@ -7,4 +7,5 @@ public class DigestiveSymptom extends Symptom{
 		// TODO Auto-generated constructor stub
 	}
 
+	
 }
